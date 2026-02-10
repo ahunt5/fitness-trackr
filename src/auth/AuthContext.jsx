@@ -3,7 +3,6 @@
  * It provides functions for the user to register, log in, and log out,
  * all of which update the token in state.
  */
-
 import { createContext, useContext, useState } from "react";
 
 // import.meta.env allows us to access environment variables,
@@ -13,7 +12,7 @@ const API = import.meta.env.VITE_API;
 const AuthContext = createContext();
 
 export function AuthProvider({ children }) {
-  const [token, setToken] = useState();
+  const [token, setToken] = useState(sessionStorage.getItem("token"));
 
   const register = async (credentials) => {
     const response = await fetch(API + "/users/register", {
@@ -26,6 +25,7 @@ export function AuthProvider({ children }) {
       throw Error(result.message);
     }
     setToken(result.token);
+    sessionStorage.setItem("token", result.token);
   };
 
   const login = async (credentials) => {
@@ -39,11 +39,29 @@ export function AuthProvider({ children }) {
       throw Error(result.message);
     }
     setToken(result.token);
+    sessionStorage.setItem("token", result.token);
   };
 
-  const logout = () => setToken(null);
+  const deleteActivity = async (id) => {
+    const response = await fetch(API + "/activities/" + id, {
+      method: "DELETE",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+    });
+    if (!response.ok) {
+      const result = await response.json();
+      throw Error(result.message);
+    }
+  };
 
-  const value = { token, register, login, logout };
+  const logout = () => {
+    setToken(null);
+    sessionStorage.removeItem("token");
+  };
+
+  const value = { token, register, login, logout, deleteActivity };
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 }
 

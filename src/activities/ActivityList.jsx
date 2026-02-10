@@ -1,8 +1,13 @@
-export default function ActivityList({ activities }) {
+import ActivityItem from "./ActivityItem";
+export default function ActivityList({ activities, syncActivities }) {
   return (
     <ul>
       {activities.map((activity) => (
-        <li key={activity.id}>{activity.name}</li>
+        <ActivityItem
+          key={activity.id}
+          activity={activity}
+          syncActivities={syncActivities}
+        />
       ))}
     </ul>
   );
