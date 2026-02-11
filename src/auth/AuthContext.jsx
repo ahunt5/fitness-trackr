@@ -51,8 +51,7 @@ export function AuthProvider({ children }) {
       },
     });
     if (!response.ok) {
-      const result = await response.json();
-      throw Error(result.message);
+      throw Error("Something went wrong.");
     }
   };
 
